@@ -7,7 +7,11 @@ THSE = {
 }
 
 function THSE.GetDB()
-	return HonorSpy and HonorSpy.db and HonorSpy.db.realm and HonorSpy.db.realm.hs
+	return HonorSpy and HonorSpy.db and HonorSpy.db.char and HonorSpy.db.char.hs
+end
+
+function THSE.GetRealmDB()
+	return HonorSpy and HonorSpy.db and HonorSpy.db.realm
 end
 
 -- ===== Shared BG data (used by overlay + honorhistory) =====
@@ -48,13 +52,12 @@ end
 HonorSpy = AceLibrary("AceAddon-2.0"):new("AceDB-2.0", "AceEvent-2.0", "AceModuleCore-2.0")
 
 HonorSpy:RegisterDB("HonorSpyDB")
-HonorSpy:RegisterDefaults('realm', {
+HonorSpy:RegisterDefaults('char', {
 	hs = {
 		overlayPos          = nil,
 		overlayHidden       = false,
 		minimapAngle        = 200,
 		minimapHidden       = false,
-		addonUsers          = {},
 		weeklyStartProgress = nil,
 		weeklyResetStamp    = 0,
 		weekApiHonor        = {},
@@ -66,6 +69,9 @@ HonorSpy:RegisterDefaults('realm', {
 		histDayCollapsed    = {},
 		histWeekCollapsed   = {},
 	}
+})
+HonorSpy:RegisterDefaults('realm', {
+	addonUsers          = {}
 })
 
 function HonorSpy:OnEnable()

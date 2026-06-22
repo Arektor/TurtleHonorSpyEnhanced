@@ -81,7 +81,7 @@ function THSE:DebugDatabase()
 	-- DB access
 	local hs = THSE.GetDB()
 	if not hs then
-		p("DB not accessible — HonorSpy.db.realm.hs is nil", 1, 0.3, 0.3)
+		p("DB not accessible — HonorSpy.db.char.hs is nil", 1, 0.3, 0.3)
 		return
 	end
 	p("DB: OK")

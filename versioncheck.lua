@@ -31,7 +31,7 @@ local function IsInBattleground()
 end
 
 local function LoadAddonUsers()
-	local hs = THSE.GetDB()
+	local hs = THSE.GetRealmDB()
 	if not hs then return end
 	if not hs.addonUsers then hs.addonUsers = {} end
 	local now = time()
@@ -47,7 +47,7 @@ end
 
 local function SaveAddonUser(name, version)
 	THSE.addonUsers[name] = { ver = version, seen = time() }
-	local hs = THSE.GetDB()
+	local hs = THSE.GetRealmDB()
 	if hs then
 		if not hs.addonUsers then hs.addonUsers = {} end
 		hs.addonUsers[name] = THSE.addonUsers[name]
@@ -196,7 +196,7 @@ end)
 
 function THSE:VersionToggleDebug()
 	THSE.versionDebug = not THSE.versionDebug
-	local hs = THSE.GetDB()
+	local hs = THSE.GetRealmDB()
 	if hs then hs.versionDebug = THSE.versionDebug end
 	DEFAULT_CHAT_FRAME:AddMessage(
 		"|cffFFD100TurtleHonorSpyEnhanced:|r Version comm debug " ..
@@ -219,7 +219,7 @@ end
 
 function THSE:VersionResetUsers()
 	THSE.addonUsers = {}
-	local hs = THSE.GetDB()
+	local hs = THSE.GetRealmDB()
 	if hs then hs.addonUsers = {} end
 	DEFAULT_CHAT_FRAME:AddMessage(
 		"|cffFFD100TurtleHonorSpyEnhanced:|r Addon users list cleared.",
