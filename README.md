@@ -25,7 +25,7 @@ Honor History
 
 **Via the Turtle WoW Launcher**
 1. Go to **AddOns → Add new addon** and paste:
-   `https://github.com/dnkrse/TurtleHonorSpyEnhanced.git`
+   `https://github.com/Arektor/TurtleHonorSpyEnhanced.git`
 2. The launcher keeps it updated automatically.
 
 **Manual**  

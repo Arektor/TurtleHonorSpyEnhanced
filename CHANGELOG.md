@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.2.1
+
+**Fixes:**
+- Rank progress tracking is now done per-character instead of per-realm
+- Downloading the add-on should no longer download the images displayed in the readme
+
 ## v2.2
 
 **Features:**
