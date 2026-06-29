@@ -255,11 +255,11 @@ dailyBGTip:SetHeight(14)
 dailyBGTip:EnableMouse(true)
 dailyBGTip:SetFrameLevel(Frame:GetFrameLevel() + 5)
 local _BG_COLORS = {
-	["Warsong Gulch"]  = { 1.0, 0.5, 0.5 },    -- red
-	["Arathi Basin"]   = { 1.0, 1.0, 0.5 },     -- yellow
-	["Blood Ring"]     = { 1.0, 0.82, 0.3 },    -- gold
-	["Thorn Gorge"]    = { 0.5, 1.0, 0.5 },     -- green
-	["Alterac Valley"] = { 0.5, 0.7, 1.0 },     -- blue
+	[THSE.LOCALE.BG.WSG]   = { 1.0, 0.5 , 0.5 },    -- red
+	[THSE.LOCALE.BG.AB]    = { 1.0, 1.0 , 0.5 },    -- yellow
+	[THSE.LOCALE.BG.BLOOD] = { 1.0, 0.82, 0.3 },    -- gold
+	[THSE.LOCALE.BG.THORN] = { 0.5, 1.0 , 0.5 },    -- green
+	[THSE.LOCALE.BG.AV]    = { 0.5, 0.7 , 1.0 },    -- blue
 }
 dailyBGTip:SetScript("OnEnter", function()
 	GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT")

@@ -15,11 +15,11 @@ local TIP_W = 220
 
 -- ===== BG zone tables =====
 local _IsBG = {
-	["Warsong Gulch"] = true,
-	["Arathi Basin"]  = true,
-	["Alterac Valley"]= true,
-	["Thorn Gorge"]   = true,
-	["Blood Ring"]    = true,
+	[THSE.LOCALE.BG.WSG]   = true,
+	[THSE.LOCALE.BG.AB]    = true,
+	[THSE.LOCALE.BG.AV]    = true,
+	[THSE.LOCALE.BG.THORN] = true,
+	[THSE.LOCALE.BG.BLOOD] = true,
 }
 
 local _ZONE_ABBR    = THSE.ZONE_ABBR
@@ -41,16 +41,16 @@ end
 
 -- Reverse lookup: rank number → rank name (by faction)
 local _NUM_TO_RANK_ALLIANCE = {
-	[1]="Private", [2]="Corporal", [3]="Sergeant", [4]="Master Sergeant",
-	[5]="Sergeant Major", [6]="Knight", [7]="Knight-Lieutenant", [8]="Knight-Captain",
-	[9]="Knight-Champion", [10]="Lieutenant Commander", [11]="Commander",
-	[12]="Marshal", [13]="Field Marshal", [14]="Grand Marshal",
+	[1]=THSE.LOCALE.ALLIANCE.R1, [2]=THSE.LOCALE.ALLIANCE.R2, [3]=THSE.LOCALE.ALLIANCE.R3, [4]=THSE.LOCALE.ALLIANCE.R4,
+	[5]=THSE.LOCALE.ALLIANCE.R5, [6]=THSE.LOCALE.ALLIANCE.R6, [7]=THSE.LOCALE.ALLIANCE.R7, [8]=THSE.LOCALE.ALLIANCE.R8,
+	[9]=THSE.LOCALE.ALLIANCE.R9, [10]=THSE.LOCALE.ALLIANCE.R10, [11]=THSE.LOCALE.ALLIANCE.R11,
+	[12]=THSE.LOCALE.ALLIANCE.R12, [13]=THSE.LOCALE.ALLIANCE.R13, [14]=THSE.LOCALE.ALLIANCE.R14,
 }
 local _NUM_TO_RANK_HORDE = {
-	[1]="Scout", [2]="Grunt", [3]="Sergeant", [4]="Senior Sergeant",
-	[5]="First Sergeant", [6]="Stone Guard", [7]="Blood Guard", [8]="Legionnaire",
-	[9]="Centurion", [10]="Champion", [11]="Lieutenant General",
-	[12]="General", [13]="Warlord", [14]="High Warlord",
+	[1]=THSE.LOCALE.HORDE.R1, [2]=THSE.LOCALE.HORDE.R2, [3]=THSE.LOCALE.HORDE.R3, [4]=THSE.LOCALE.HORDE.R4,
+	[5]=THSE.LOCALE.HORDE.R5, [6]=THSE.LOCALE.HORDE.R6, [7]=THSE.LOCALE.HORDE.R7, [8]=THSE.LOCALE.HORDE.R8,
+	[9]=THSE.LOCALE.HORDE.R9, [10]=THSE.LOCALE.HORDE.R10, [11]=THSE.LOCALE.HORDE.R11,
+	[12]=THSE.LOCALE.HORDE.R12, [13]=THSE.LOCALE.HORDE.R13, [14]=THSE.LOCALE.HORDE.R14,
 }
 
 -- Look up a player's rank name from the BG scoreboard (returns nil outside BGs)
@@ -65,6 +65,9 @@ local function RefreshBGScoreCache()
 		if name and type(rank) == "number" and rank > 0 then
 			local tbl = (faction == 1) and _NUM_TO_RANK_ALLIANCE or _NUM_TO_RANK_HORDE
 			local rankName = tbl[rank]
+			if type(rankName) == "table" then
+				rankName = rankName[1]
+			end
 			-- Extended ranks (15+): use GetPVPRankInfo API
 			if not rankName and GetPVPRankInfo then
 				rankName = GetPVPRankInfo(rank)
@@ -92,29 +95,30 @@ local function ScoreboardRank(playerName)
 	return _bgScoreRank[playerName] or _bgScoreRank[short]
 end
 
--- Quests that turn in marks from all three main BGs simultaneously
-local _CONCERTED_QUEST = {
-	["Concerted Efforts"] = true,  -- Alliance
-	["For Great Honor"]   = true,  -- Horde
-}
+
 
 -- ===== Rank lookup =====
-local _RANK_TO_NUM = {
-	["private"]=1,         ["scout"]=1,
-	["corporal"]=2,        ["grunt"]=2,
-	["sergeant"]=3,        ["sergeant"]=3,
-	["master sergeant"]=4, ["senior sergeant"]=4,
-	["sergeant major"]=5,  ["first sergeant"]=5,
-	["knight"]=6,          ["stone guard"]=6,
-	["knight-lieutenant"]=7, ["blood guard"]=7,
-	["knight-captain"]=8,  ["legionnaire"]=8,
-	["knight-champion"]=9, ["centurion"]=9,
-	["lieutenant commander"]=10, ["champion"]=10,
-	["commander"]=11,      ["lieutenant general"]=11,
-	["marshal"]=12,        ["general"]=12,
-	["field marshal"]=13,  ["warlord"]=13,
-	["grand marshal"]=14,  ["high warlord"]=14,
-}
+local _RANK_TO_NUM = {}
+for idx,val in pairs(_NUM_TO_RANK_ALLIANCE) do
+	if type(val) == "string" then
+		_RANK_TO_NUM[val] = idx
+	elseif type(val) == "table" then
+		for _,rank in pairs(val) do
+			_RANK_TO_NUM[rank] = idx
+		end
+	end
+end
+for idx,val in pairs(_NUM_TO_RANK_HORDE) do
+	if type(val) == "string" then
+		_RANK_TO_NUM[val] = idx
+	elseif type(val) == "table" then
+		for _,rank in pairs(val) do
+			_RANK_TO_NUM[rank] = idx
+		end
+	end
+end
+
+
 
 local function GetRankNum(rankName)
 	if not rankName then return 0 end
@@ -1347,7 +1351,7 @@ local function RenderEntries(entries, yOff, cr, cg_c, cb, amtOffset, hideZero)
 			P.ts[ei]:Hide()
 			local isConcerted = (e.type == "turnin" or e.type == "award")
 				and e.questName
-				and _CONCERTED_QUEST[e.questName]
+				and THSE.LOCALE.CONCERTED_QUESTS[string.lower(e.questName)]
 			P.icon2[ei]:Hide(); P.icon3[ei]:Hide()
 			if e.type == "_compact" then
 				-- Compact summary row — pick icon by subtype
@@ -1371,19 +1375,19 @@ local function RenderEntries(entries, yOff, cr, cg_c, cb, amtOffset, hideZero)
 				P.name[ei]:SetPoint("TOPLEFT", content, "TOPLEFT", 46, -yOff - 1)
 			elseif isConcerted then
 				P.icon[ei]:ClearAllPoints()
-				P.icon[ei]:SetTexture(_BG_MARK_ICON["Warsong Gulch"])
+				P.icon[ei]:SetTexture(_BG_MARK_ICON[THSE.LOCALE.BG.WSG])
 				P.icon[ei]:SetTexCoord(0.05, 0.95, 0.05, 0.95)
 				P.icon[ei]:SetDesaturated(nil)
 				P.icon[ei]:SetVertexColor(1, 1, 1)
 				P.icon[ei]:SetPoint("TOPLEFT", content, "TOPLEFT", 13, -yOff)
 				P.icon[ei]:Show()
 				P.icon2[ei]:ClearAllPoints()
-				P.icon2[ei]:SetTexture(_BG_MARK_ICON["Arathi Basin"])
+				P.icon2[ei]:SetTexture(_BG_MARK_ICON[THSE.LOCALE.BG.AB])
 				P.icon2[ei]:SetTexCoord(0.05, 0.95, 0.05, 0.95)
 				P.icon2[ei]:SetPoint("TOPLEFT", content, "TOPLEFT", 28, -yOff)
 				P.icon2[ei]:Show()
 				P.icon3[ei]:ClearAllPoints()
-				P.icon3[ei]:SetTexture(_BG_MARK_ICON["Alterac Valley"])
+				P.icon3[ei]:SetTexture(_BG_MARK_ICON[THSE.LOCALE.BG.AV])
 				P.icon3[ei]:SetTexCoord(0.05, 0.95, 0.05, 0.95)
 				P.icon3[ei]:SetPoint("TOPLEFT", content, "TOPLEFT", 43, -yOff)
 				P.icon3[ei]:Show()
@@ -2600,15 +2604,20 @@ _ef:SetScript("OnEvent", function()
 		if not hs.honorHistory then hs.honorHistory = {} end
 		local msg = string.lower(arg1 or "")
 		local result = nil
-		local hasWin = string.find(msg, "win") or string.find(msg, "victori") or string.find(msg, "conquer")
-		local hasLoss = string.find(msg, "defea") or string.find(msg, "lost the battle")
+		local hasWin, hasLoss = false, false
+		for _, substr in ipairs(THSE.LOCALE.PATTERNS.BG_WIN) do
+			if string.find(msg, substr, 1, true) then hasWin = true; break end
+		end
+		for _, substr in ipairs(THSE.LOCALE.PATTERNS.BG_LOSS) do
+			if string.find(msg, substr, 1, true) then hasLoss = true; break end
+		end
 		if hasWin and not hasLoss then
 			-- "wins" appears in both "Alliance wins" and "Horde wins", so
 			-- compare which faction is winning against the player's own faction.
 			local playerFaction = string.lower(UnitFactionGroup("player") or "")
 			local factionInMsg = nil
-			if string.find(msg, "alliance") then factionInMsg = "alliance" end
-			if string.find(msg, "horde")    then factionInMsg = "horde"    end
+			if string.find(msg, THSE.LOCALE.PATTERNS.FACTION_ALLIANCE) then factionInMsg = "alliance" end
+			if string.find(msg, THSE.LOCALE.PATTERNS.FACTION_HORDE)    then factionInMsg = "horde"    end
 			if factionInMsg and playerFaction ~= "" and factionInMsg ~= playerFaction then
 				result = "loss"
 			else
@@ -2635,7 +2644,7 @@ _ef:SetScript("OnEvent", function()
 		local lmsg = string.lower(msg)
 
 		-- "You have been awarded X honor points."
-		local _, _, awardedStr = string.find(lmsg, "awarded (%d+) honor")
+		local _, _, awardedStr = string.find(lmsg, THSE.LOCALE.PATTERNS.HONOR_AWARD)
 		if awardedStr then
 			if not hs then return end
 			if not hs.honorHistory then hs.honorHistory = {} end
@@ -2662,12 +2671,19 @@ _ef:SetScript("OnEvent", function()
 		end
 
 		-- Quest turn-in fallback: "X completed."
-		if string.find(lmsg, "completed") then
+		local questCompleted = false
+		for _, substr in ipairs(THSE.LOCALE.PATTERNS.QUEST_COMPLETE) do
+			if string.find(lmsg, substr, 1, true) then 
+				questCompleted = true
+				break
+			end
+		end
+		if questCompleted then
 			-- Check for Concerted Efforts / For Great Honor by name first
 			local foundConcerted = nil
-			for qname, _ in pairs(_CONCERTED_QUEST) do
-				if string.find(lmsg, string.lower(qname), 1, true) then
-					foundConcerted = qname
+			for lowerName, displayName in pairs(THSE.LOCALE.CONCERTED_QUESTS) do
+				if string.find(lmsg, lowerName, 1, true) then
+					foundConcerted = displayName  -- store display name, not the lowercased key
 					break
 				end
 			end
@@ -2694,8 +2710,7 @@ _ef:SetScript("OnEvent", function()
 		local lmsg = string.lower(msg)
 
 		-- Kill message: "X dies, honorable kill Rank: General  (Estimated Honor Points: N)"
-		local _, _, v, r, n = string.find(msg,
-			"(.+) dies, honorable kill Rank: ([^%(]+)%(Estimated Honor Points: (%d+)%)")
+		local _, _, v, r, n = string.find(msg, THSE.LOCALE.PATTERNS.HONOR_KILL)
 		if v and r and n then
 			local victim = v
 			local victimRank = string.gsub(r, "%s+$", "")
@@ -2709,8 +2724,8 @@ _ef:SetScript("OnEvent", function()
 			return
 		end
 
-		-- Zero-honor kill: "X dies, dishonorable kill." (server text for kills beyond 20k HKs)
-		local _, _, dv = string.find(msg, "(.+) dies, dishonorable kill")
+		-- Zero-honor kill: "X dies, dishonorable kill." (server text for kills beyond 20k honor cap)
+		local _, _, dv = string.find(msg, THSE.LOCALE.PATTERNS.DISHONOR_KILL)
 		if dv then
 			local zone = GetRealZoneText()
 			local victimRank = ScoreboardRank(dv)
@@ -2723,9 +2738,10 @@ _ef:SetScript("OnEvent", function()
 		end
 
 		-- Award/gain message
-		local _, _, a = string.find(lmsg, "awarded (%d+) honor")
-		if not a then
-			_, _, a = string.find(lmsg, "you gain (%d+) honor")
+		local a = nil
+		for _, pattern in ipairs(THSE.LOCALE.PATTERNS.HONOR_AMOUNT) do
+			local _, _, cap = string.find(lmsg, pattern)
+			if cap then a = cap; break end
 		end
 		if not a then return end
 		local amount = tonumber(a) or 0

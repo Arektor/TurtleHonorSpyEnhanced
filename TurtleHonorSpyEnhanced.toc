@@ -9,6 +9,8 @@
 
 Libs\embeds.xml
 
+Locales\enUS.lua
+
 honorspy.lua
 overlay.lua
 versioncheck.lua
